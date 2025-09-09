@@ -1,0 +1,32 @@
+# BTC虚拟货币数据获取系统依赖文件
+# 版本更新日期: 2025-09-09
+
+# HTTP请求库 - 用于API调用
+requests>=2.31.0
+
+# YAML配置文件解析 - 支持配置文件注释
+PyYAML>=6.0.1
+
+# 可选依赖 - 如果需要更好的性能和更多功能
+# 加密HTTP请求支持
+urllib3[secure]>=2.0.0
+
+# JSON处理增强（可选）
+# ujson>=5.8.0
+
+# 日期时间处理增强（可选）
+# python-dateutil>=2.8.2
+
+# 数据库相关（SQLite3已内置于Python标准库）
+# 如果需要其他数据库支持，可以添加：
+# pymongo>=4.5.0  # MongoDB支持
+# psycopg2>=2.9.0  # PostgreSQL支持
+# mysql-connector-python>=8.1.0  # MySQL支持
+
+# 开发调试工具（可选）
+# ipython>=8.15.0
+# jupyter>=1.0.0
+
+# 测试工具（可选）
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
