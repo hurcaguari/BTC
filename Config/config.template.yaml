@@ -1,11 +1,21 @@
-# BTC代币数据获取系统配置文件
+# BTC代币数据获取系统配置文件模板
 # 支持获取BTC、ETH、KAS、BNB等代币的价格、供应量和算力数据
+# 
+# 使用说明：
+# 1. 复制此文件为 config.yaml
+# 2. 将 YOUR_API_KEY_HERE 替换为您的真实API密钥
+# 3. 根据需要调整其他配置参数
 
 # API密钥配置
 api_keys:
   # Etherscan API密钥 - 用于获取ETH相关数据和多链余额查询
   # 获取地址: https://etherscan.io/apis
-  etherscan: "U6GXWFS91WK8XG3XH4DCWVVTN24N35HW92"
+  # ⚠️ 请将下面的 YOUR_ETHERSCAN_API_KEY_HERE 替换为您的真实API密钥
+  etherscan: "YOUR_ETHERSCAN_API_KEY_HERE"
+  
+  # 其他API密钥（如需要）
+  # coingecko: "YOUR_COINGECKO_API_KEY_HERE"
+  # binance: "YOUR_BINANCE_API_KEY_HERE"
 
 # 缓存系统配置
 cache:
@@ -49,31 +59,31 @@ tokens:
   - SOL   # Solana - 支持价格、供应量 (POS，无算力)
   - AVAX  # Avalanche - 支持价格、供应量 (POS，无算力)
   - MATIC # Polygon - 支持价格、供应量 (POS，无算力)
-  
-  # 经典币种
-  - LTC   # 莱特币 - 支持价格、供应量 (POW，但当前API可能无算力数据)
-  - DOGE  # 狗狗币 - 支持价格、供应量 (POW，但当前API可能无算力数据)
-  
-  # 二层网络
+  - LTC   # Litecoin - 支持价格、供应量、算力 (POW)
+  - DOGE  # Dogecoin - 支持价格、供应量、算力 (POW)
   - ARB   # Arbitrum - 支持价格、供应量 (Layer2，无算力)
   - OP    # Optimism - 支持价格、供应量 (Layer2，无算力)
 
-# 测试用配置 - 如果只想测试部分币种，可以使用以下配置
-# tokens:
-#   - BTC
-#   - ETH
-#   - KAS
+# 数据格式配置
+display:
+  # 货币显示格式
+  currency:
+    # 主要货币（美元）
+    primary: "USD"
+    
+    # 次要货币（人民币）
+    secondary: "CNY"
+    
+    # 汇率（USD to CNY，可定期更新）
+    exchange_rate: 7.2
 
-# 数据源配置
-data_sources:
-  # 价格数据源 - CoinGecko免费API
-  price_api: "https://api.coingecko.com/api/v3"
+# 日志配置
+logging:
+  # 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
   
-  # 汇率数据源 - 获取USD到CNY汇率
-  exchange_rate_api: "https://api.exchangerate-api.com/v4/latest/USD"
+  # 是否启用文件日志
+  file_enabled: false
   
-  # 区块链数据源
-  blockchain:
-    btc: "https://api.blockchain.info/stats"     # BTC算力数据
-    kas: "https://api.kaspa.org/info/hashrate"   # KAS算力数据
-    eth: "https://api.etherscan.io/api"          # ETH供应量数据
+  # 日志文件路径
+  file_path: "logs/system.log"

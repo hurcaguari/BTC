@@ -1,0 +1,59 @@
+# 敏感配置文件
+Config/config.yaml
+config.yaml
+*.env
+.env*
+
+# API密钥和敏感信息
+api_keys.yaml
+secrets.yaml
+credentials.yaml
+
+# Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# IDE配置
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+cache/*.db
+
+# 日志文件
+logs/
+*.log
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.tmp
+*.temp
+temp/
+tmp/
+
+# 构建输出
+dist/
+build/
+*.egg-info/
+
+# 测试覆盖率报告
+.coverage
+htmlcov/
+.pytest_cache/
