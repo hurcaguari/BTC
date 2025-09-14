@@ -1,0 +1,279 @@
+# 虚拟货币挖矿设备参数配置文件
+# 包含主流矿机的详细技术参数和价格信息
+# 数据来源：官方规格表和市场价格（数据更新时间：2025年9月）
+
+# Bitcoin (BTC) 矿机 - SHA-256算法
+bitcoin_miners:
+  # 比特大陆 Antminer 系列
+  antminer_s19_pro:
+    name: "Antminer S19 Pro"
+    manufacturer: "Bitmain"
+    algorithm: "SHA-256"
+    hashrate: 110
+    hashrate_unit: "TH/s"
+    power_consumption: 3250
+    power_efficiency: 29.5  # J/TH
+    price: 5000
+    release_date: "2020-05"
+    dimensions: "400 x 195 x 290 mm"
+    weight: 13.2
+    noise_level: 75
+    operating_temperature: "5~40°C"
+    network_connection: "Ethernet"
+    
+  antminer_s19j_pro:
+    name: "Antminer S19j Pro"
+    manufacturer: "Bitmain"
+    algorithm: "SHA-256"
+    hashrate: 100
+    hashrate_unit: "TH/s"
+    power_consumption: 3068
+    power_efficiency: 30.68
+    price: 4200
+    release_date: "2021-03"
+    dimensions: "400 x 195 x 290 mm"
+    weight: 13.5
+    noise_level: 75
+    
+  antminer_s21:
+    name: "Antminer S21"
+    manufacturer: "Bitmain"
+    algorithm: "SHA-256"
+    hashrate: 200
+    hashrate_unit: "TH/s"
+    power_consumption: 3550
+    power_efficiency: 17.75
+    price: 8000
+    release_date: "2023-09"
+    dimensions: "430 x 195 x 370 mm"
+    weight: 14.5
+    noise_level: 75
+    
+  antminer_s21_hyd:
+    name: "Antminer S21 Hyd"
+    manufacturer: "Bitmain"
+    algorithm: "SHA-256"
+    hashrate: 335
+    hashrate_unit: "TH/s"
+    power_consumption: 5360
+    power_efficiency: 16.0
+    price: 15000
+    cooling_type: "Water Cooling"
+    release_date: "2023-11"
+    
+  # 神马矿机系列
+  whatsminer_m50s:
+    name: "Whatsminer M50S"
+    manufacturer: "MicroBT"
+    algorithm: "SHA-256"
+    hashrate: 126
+    hashrate_unit: "TH/s"
+    power_consumption: 3306
+    power_efficiency: 26.2
+    price: 4500
+    release_date: "2021-08"
+    dimensions: "370 x 195 x 290 mm"
+    weight: 12.5
+    noise_level: 75
+    
+  whatsminer_m56s:
+    name: "Whatsminer M56S"
+    manufacturer: "MicroBT"
+    algorithm: "SHA-256"
+    hashrate: 212
+    hashrate_unit: "TH/s"
+    power_consumption: 5550
+    power_efficiency: 26.2
+    price: 9500
+    release_date: "2023-06"
+    
+  # 芯动矿机系列
+  innosilicon_t3_57t:
+    name: "Innosilicon T3+ 57T"
+    manufacturer: "Innosilicon"
+    algorithm: "SHA-256"
+    hashrate: 57
+    hashrate_unit: "TH/s"
+    power_consumption: 3300
+    power_efficiency: 57.9
+    price: 2800
+    release_date: "2019-12"
+
+# Kaspa (KAS) 矿机 - kHeavyHash算法
+kaspa_miners:
+  ks3:
+    name: "KS3 Kaspa Miner"
+    manufacturer: "iBeLink"
+    algorithm: "kHeavyHash"
+    hashrate: 8.3
+    hashrate_unit: "TH/s"
+    power_consumption: 3188
+    power_efficiency: 384  # J/TH
+    price: 12000
+    release_date: "2023-08"
+    dimensions: "430 x 195 x 370 mm"
+    weight: 15.0
+    noise_level: 75
+    
+  ks5l:
+    name: "KS5L Kaspa Miner"
+    manufacturer: "iBeLink"
+    algorithm: "kHeavyHash"
+    hashrate: 15.5
+    hashrate_unit: "TH/s"
+    power_consumption: 3400
+    power_efficiency: 219
+    price: 18000
+    release_date: "2024-02"
+    
+  ks5m:
+    name: "KS5M Kaspa Miner"
+    manufacturer: "iBeLink"
+    algorithm: "kHeavyHash"
+    hashrate: 21
+    hashrate_unit: "TH/s"
+    power_consumption: 3500
+    power_efficiency: 167
+    price: 25000
+    release_date: "2024-06"
+    
+  iceriver_ks3m:
+    name: "IceRiver KS3M"
+    manufacturer: "IceRiver"
+    algorithm: "kHeavyHash"
+    hashrate: 6
+    hashrate_unit: "TH/s"
+    power_consumption: 3400
+    power_efficiency: 567
+    price: 8000
+    release_date: "2023-10"
+
+# Litecoin (LTC) 矿机 - Scrypt算法
+litecoin_miners:
+  antminer_l7:
+    name: "Antminer L7"
+    manufacturer: "Bitmain"
+    algorithm: "Scrypt"
+    hashrate: 9.5
+    hashrate_unit: "GH/s"
+    power_consumption: 3425
+    power_efficiency: 360.5  # J/GH
+    price: 6000
+    release_date: "2021-11"
+    dimensions: "400 x 195 x 290 mm"
+    weight: 13.5
+    noise_level: 75
+    
+  antminer_l3:
+    name: "Antminer L3+"
+    manufacturer: "Bitmain"
+    algorithm: "Scrypt"
+    hashrate: 504
+    hashrate_unit: "MH/s"
+    power_consumption: 800
+    power_efficiency: 1587  # J/GH
+    price: 800
+    release_date: "2017-04"
+    dimensions: "352 x 130 x 187.5 mm"
+    weight: 4.4
+    noise_level: 60
+    
+  innosilicon_a6:
+    name: "Innosilicon A6 LTCMaster"
+    manufacturer: "Innosilicon"
+    algorithm: "Scrypt"
+    hashrate: 1230
+    hashrate_unit: "MH/s"
+    power_consumption: 1500
+    power_efficiency: 1220  # J/GH
+    price: 1500
+    release_date: "2018-06"
+
+# Dogecoin (DOGE) 矿机 - Scrypt算法（与LTC兼容）
+dogecoin_miners:
+  # DOGE使用与LTC相同的Scrypt算法，因此LTC矿机也可以挖DOGE
+  # 这里列出专门针对DOGE优化或营销的矿机
+  antminer_l7_doge:
+    name: "Antminer L7 (DOGE版)"
+    manufacturer: "Bitmain"
+    algorithm: "Scrypt"
+    hashrate: 9.5
+    hashrate_unit: "GH/s"
+    power_consumption: 3425
+    power_efficiency: 360.5
+    price: 5500  # DOGE版本价格稍低
+    release_date: "2021-11"
+    target_coin: "DOGE"
+    
+  goldshell_lt5:
+    name: "Goldshell LT5"
+    manufacturer: "Goldshell"
+    algorithm: "Scrypt"
+    hashrate: 2.05
+    hashrate_unit: "GH/s"
+    power_consumption: 2080
+    power_efficiency: 1015
+    price: 2500
+    release_date: "2021-09"
+    dimensions: "264 x 200 x 290 mm"
+    weight: 8.5
+    noise_level: 60
+
+# 矿机组合套餐
+mining_packages:
+  small_farm_btc:
+    name: "小型BTC矿场套餐"
+    description: "适合个人或小型投资者的BTC挖矿方案"
+    miners:
+      - miner: "antminer_s19_pro"
+        quantity: 10
+    total_hashrate: "1100 TH/s"
+    total_power: 32500
+    estimated_investment: 50000
+    recommended_electricity_rate: 0.06
+    
+  medium_farm_btc:
+    name: "中型BTC矿场套餐"
+    description: "适合中等规模投资的BTC挖矿方案"
+    miners:
+      - miner: "antminer_s21"
+        quantity: 50
+    total_hashrate: "10000 TH/s"
+    total_power: 177500
+    estimated_investment: 400000
+    recommended_electricity_rate: 0.05
+    
+  kaspa_starter:
+    name: "Kaspa入门套餐"
+    description: "Kaspa挖矿入门方案"
+    miners:
+      - miner: "ks3"
+        quantity: 5
+    total_hashrate: "41.5 TH/s"
+    total_power: 15940
+    estimated_investment: 60000
+    recommended_electricity_rate: 0.08
+
+# 价格更新信息
+price_update:
+  last_updated: "2025-09-10"
+  currency: "USD"
+  notes: "价格基于市场平均价格，实际价格可能因供应商、地区和订购数量而有所差异"
+  price_volatility_warning: "矿机价格波动较大，建议购买前确认最新报价"
+  
+# 风险提示
+risk_warnings:
+  - "矿机价格受市场供需影响，波动较大"
+  - "新一代矿机可能导致现有设备贬值"
+  - "挖矿收益受币价、网络算力、电费等多因素影响"
+  - "矿机存在硬件故障风险，建议准备备用设备"
+  - "政策法规变化可能影响挖矿业务"
+  - "矿机噪音和散热需要考虑运营场地要求"
+
+# 购买建议
+purchase_recommendations:
+  efficiency_priority: "优先选择能效比（J/TH）较低的新款矿机"
+  roi_calculation: "详细计算投资回报周期，考虑电费、维护成本"
+  market_timing: "关注币价趋势和网络算力变化"
+  supplier_selection: "选择有保修服务的正规供应商"
+  batch_purchase: "批量采购可获得更优惠价格"

@@ -2,7 +2,7 @@ import Lib
 import time
 
 # 使用Config目录下的YAML配置文件
-api = Lib.EtherscanAPI(config_path='Config/config.yaml')
+api = Lib.EtherscanAPI()
 
 # 显示缓存统计信息
 print("=== 缓存状态 ===")

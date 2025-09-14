@@ -51,23 +51,8 @@ class EtherscanAPI:
         # 最后一次请求时间
         self._last_request_time = 0
         
-        # 支持的主流链和对应的Chain ID
-        self.chains = {
-            # 主网
-            'ETH': {'chain_id': 1, 'name': 'Ethereum Mainnet'},
-            'BNB': {'chain_id': 97, 'name': 'BNB Smart Chain Mainnet'},
-            'MATIC': {'chain_id': 137, 'name': 'Polygon Mainnet'},
-            'ARB': {'chain_id': 42161, 'name': 'Arbitrum One Mainnet'},
-            'OP': {'chain_id': 10, 'name': 'OP Mainnet'},
-            'BASE': {'chain_id': 8453, 'name': 'Base Mainnet'},
-            'AVAX': {'chain_id': 43114, 'name': 'Avalanche C-Chain'},
-            'BLAST': {'chain_id': 81457, 'name': 'Blast Mainnet'},
-            'SCROLL': {'chain_id': 534352, 'name': 'Scroll Mainnet'},
-            'LINEA': {'chain_id': 59144, 'name': 'Linea Mainnet'},
-            # 测试网
-            'ETH_SEPOLIA': {'chain_id': 11155111, 'name': 'Sepolia Testnet'},
-            'BNB_TEST': {'chain_id': 97, 'name': 'BNB Smart Chain Testnet'},
-        }
+        # 初始化链映射（先用硬编码的备用映射，然后尝试从chainlist API更新）
+        self._init_chain_mappings()
         
         # 代币到CoinGecko ID的映射
         self.coingecko_ids = {
@@ -81,7 +66,11 @@ class EtherscanAPI:
             'DOGE': 'dogecoin',
             'ARB': 'arbitrum',
             'OP': 'optimism',
-            'SOL': 'solana'
+            'SOL': 'solana',
+            'BASE': 'base',
+            'BLAST': 'blast',
+            'SCROLL': 'scroll',
+            'LINEA': 'linea'
         }
         
     def _load_config(self, path):
@@ -261,12 +250,16 @@ class EtherscanAPI:
             resp = requests.get(url, timeout=self.timeout)
             if resp.status_code == 200:
                 data = resp.json()
-                rate = data['rates'].get('CNY', 7.2)
-                self._set_cached_data(cache_key, rate)
-                return rate
-        except:
-            pass
-        return 7.2  # 默认汇率
+                if 'rates' in data and 'CNY' in data['rates']:
+                    rate = data['rates']['CNY']
+                    # 只有成功获取汇率时才缓存
+                    self._set_cached_data(cache_key, rate)
+                    return rate
+        except Exception as e:
+            print(f"获取汇率失败: {e}")
+            
+        # 失败时返回默认汇率，不缓存
+        return 7.2
     
     def get_token_price(self, token_symbol):
         """获取代币价格（美元和人民币）"""
@@ -286,17 +279,21 @@ class EtherscanAPI:
             resp = requests.get(url, timeout=self.timeout)
             if resp.status_code == 200:
                 data = resp.json()
-                usd_price = data[coingecko_id]['usd']
-                
-                # 获取汇率并计算人民币价格
-                usd_to_cny = self.get_usd_to_cny_rate()
-                cny_price = usd_price * usd_to_cny
-                
-                result = (usd_price, cny_price)
-                self._set_cached_data(cache_key, result)
-                return result
-        except:
-            pass
+                if coingecko_id in data and 'usd' in data[coingecko_id]:
+                    usd_price = data[coingecko_id]['usd']
+                    
+                    # 获取汇率并计算人民币价格
+                    usd_to_cny = self.get_usd_to_cny_rate()
+                    cny_price = usd_price * usd_to_cny
+                    
+                    result = (usd_price, cny_price)
+                    # 只有成功获取价格数据时才缓存
+                    self._set_cached_data(cache_key, result)
+                    return result
+        except Exception as e:
+            print(f"获取{token_symbol}价格失败: {e}")
+            
+        # 失败时不缓存，直接返回
         return None, None
     
     def get_token_supply(self, token_symbol):
@@ -351,6 +348,7 @@ class EtherscanAPI:
             return cached
         
         result = None, 'N/A (POS)'
+        success = False
         
         if token_symbol == 'BTC':
             self._wait_for_rate_limit()
@@ -362,8 +360,9 @@ class EtherscanAPI:
                     hashrate = data.get('hash_rate')  # GH/s
                     if hashrate:
                         result = (hashrate, 'GH/s')
-            except:
-                pass
+                        success = True
+            except Exception as e:
+                print(f"获取BTC算力失败: {e}")
                 
         elif token_symbol == 'KAS':
             self._wait_for_rate_limit()
@@ -375,10 +374,17 @@ class EtherscanAPI:
                     hashrate = data.get('hashrate')
                     if hashrate:
                         result = (hashrate, 'H/s')
-            except:
-                pass
+                        success = True
+            except Exception as e:
+                print(f"获取KAS算力失败: {e}")
+        else:
+            # 对于POS币种或其他非POW币种，直接返回并缓存
+            success = True
         
-        self._set_cached_data(cache_key, result)
+        # 只有成功获取数据时才缓存
+        if success:
+            self._set_cached_data(cache_key, result)
+        
         return result
     
     def get_chain_info(self, chain_symbol):
@@ -513,6 +519,187 @@ class EtherscanAPI:
         except Exception as e:
             print(f"清除缓存失败: {e}")
             return False
+    
+    def _init_chain_mappings(self):
+        """初始化链映射，必须从chainlist API获取"""
+        # 尝试从chainlist API获取
+        try:
+            chainlist_data = self._get_chainlist_data()
+            if chainlist_data:
+                dynamic_chains = self._parse_chainlist_data(chainlist_data)
+                if dynamic_chains:
+                    self.chains = dynamic_chains
+                    print(f"📋 从chainlist API加载了 {len(dynamic_chains)} 个链配置")
+                    return
+                else:
+                    print("❌ chainlist数据解析失败")
+            else:
+                print("❌ 无法获取chainlist数据")
+        except Exception as e:
+            print(f"❌ chainlist初始化失败: {e}")
+        
+        # 如果所有尝试都失败了，抛出异常
+        raise RuntimeError("❌ 无法初始化链映射：chainlist API不可用且不允许使用备用映射")
+
+    def _get_chainlist_data(self):
+        """获取chainlist数据（带缓存）"""
+        cache_key = "chainlist_data"
+        
+        # 尝试从缓存获取
+        cached_data = self._get_cached_data(cache_key)
+        if cached_data:
+            print("📦 使用缓存的chainlist数据")
+            return cached_data
+        
+        # 缓存未命中，从API获取
+        try:
+            print("🌐 从API获取chainlist数据...")
+            self._wait_for_rate_limit()
+            
+            url = "https://api.etherscan.io/v2/chainlist"
+            response = requests.get(url, timeout=self.timeout)
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if data.get('result'):
+                # 缓存数据
+                self._set_cached_data(cache_key, data)
+                print(f"✅ 获取到 {len(data['result'])} 条链配置数据")
+                return data
+            else:
+                print("❌ API返回数据格式异常")
+                return None
+                
+        except Exception as e:
+            print(f"❌ 获取chainlist数据失败: {e}")
+            return None
+    
+    def _parse_chainlist_data(self, data):
+        """解析chainlist数据并构建映射"""
+        try:
+            chains_result = data.get('result', [])
+            
+            # 解析链信息，优先保留主网链
+            mainnet_priority = {}  # 用于存储每个符号的最佳链选择
+            
+            for chain_info in chains_result:
+                chain_id = int(chain_info.get('chainid', 0))
+                chain_name = chain_info.get('chainname', '')
+                api_url = chain_info.get('apiurl', '')
+                block_explorer = chain_info.get('blockexplorer', '')
+                status = chain_info.get('status', 0)
+                
+                # 只处理状态为1（正常）的链
+                if status != 1:
+                    continue
+                
+                # 提取代币符号
+                token_symbol = self._extract_token_symbol(chain_name, chain_id)
+                if not token_symbol:
+                    continue
+                
+                # 构建链信息
+                chain_data = {
+                    'chain_id': chain_id,
+                    'name': chain_name,
+                    'api_url': api_url,
+                    'explorer': block_explorer
+                }
+                
+                # 优先级选择逻辑：主网 > 测试网
+                is_mainnet = not self._is_testnet(chain_name)
+                
+                if token_symbol not in mainnet_priority:
+                    mainnet_priority[token_symbol] = (chain_data, is_mainnet, chain_id)
+                else:
+                    current_data, current_is_mainnet, current_id = mainnet_priority[token_symbol]
+                    
+                    # 如果当前是主网而存储的是测试网，则替换
+                    if is_mainnet and not current_is_mainnet:
+                        mainnet_priority[token_symbol] = (chain_data, is_mainnet, chain_id)
+                    # 如果都是主网，选择较小的chain_id（通常是原生链）
+                    elif is_mainnet and current_is_mainnet and chain_id < current_id:
+                        mainnet_priority[token_symbol] = (chain_data, is_mainnet, chain_id)
+            
+            # 构建最终映射
+            result_chains = {}
+            for symbol, (chain_data, is_mainnet, _) in mainnet_priority.items():
+                result_chains[symbol] = chain_data
+            
+            print(f"📋 解析到 {len(result_chains)} 个链配置（优先选择主网）")
+            for symbol, data in list(result_chains.items())[:10]:  # 显示前10个
+                print(f"   {symbol}: {data['name']} (ID: {data['chain_id']})")
+            
+            return result_chains
+            
+        except Exception as e:
+            print(f"❌ 解析chainlist数据失败: {e}")
+            return {}
+    
+    def _extract_token_symbol(self, chain_name, chain_id):
+        """从链名称中提取代币符号"""
+        chain_name = chain_name.lower()
+        
+        # 特殊映射规则
+        symbol_mappings = {
+            # Ethereum生态
+            'ethereum': 'ETH',
+            'sepolia': 'ETH_SEPOLIA' if 'sepolia' in chain_name else 'ETH',
+            'holesky': 'ETH_HOLESKY',
+            
+            # BSC生态  
+            'bnb smart chain': 'BNB',
+            'bsc': 'BNB',
+            'binance': 'BNB',
+            
+            # Polygon生态
+            'polygon': 'MATIC',
+            'matic': 'MATIC',
+            'zkevm': 'ZKEVM',
+            
+            # Layer 2
+            'arbitrum': 'ARB',
+            'optimism': 'OP', 
+            'base': 'BASE',
+            'blast': 'BLAST',
+            'scroll': 'SCROLL',
+            'linea': 'LINEA',
+            
+            # 其他主要链
+            'avalanche': 'AVAX',
+            'cronos': 'CRO',
+            'celo': 'CELO',
+            'gnosis': 'GNOSIS',
+            'mantle': 'MNT',
+            'moonbeam': 'GLMR',
+            'moonriver': 'MOVR',
+            'bittorrent': 'BTT',
+            'fraxtal': 'FRAX',
+            'zksync': 'ZK'
+        }
+        
+        # 遍历映射规则
+        for pattern, symbol in symbol_mappings.items():
+            if pattern in chain_name:
+                # 处理测试网后缀
+                if any(test in chain_name for test in ['testnet', 'sepolia', 'holesky', 'fuji', 'amoy']):
+                    if not symbol.endswith('_TEST') and not symbol.endswith('_SEPOLIA') and not symbol.endswith('_HOLESKY'):
+                        if 'sepolia' in chain_name:
+                            return f"{symbol.split('_')[0]}_SEPOLIA"
+                        elif 'holesky' in chain_name:
+                            return f"{symbol.split('_')[0]}_HOLESKY"  
+                        else:
+                            return f"{symbol.split('_')[0]}_TEST"
+                return symbol
+        
+        return None
+    
+    def _is_testnet(self, chain_name):
+        """判断是否为测试网"""
+        testnet_indicators = ['testnet', 'sepolia', 'holesky', 'test', 'fuji', 'amoy', 'goerli']
+        chain_name_lower = chain_name.lower()
+        return any(indicator in chain_name_lower for indicator in testnet_indicators)
 
 
 # 模块测试代码
